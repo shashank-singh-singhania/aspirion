@@ -6,10 +6,10 @@ import { Brain, Moon, Sun } from "lucide-react"
 import Link from "next/link"
 
 export default function Navbar() {
-  const [theme, setTheme] = useState('light')
+  const [theme, setTheme] = useState('dark') // Set default theme to dark
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem('theme') || 'light'
+    const savedTheme = localStorage.getItem('theme') || 'dark' // Default to dark if no theme is saved
     setTheme(savedTheme)
     document.documentElement.classList.toggle('dark', savedTheme === 'dark')
   }, [])
