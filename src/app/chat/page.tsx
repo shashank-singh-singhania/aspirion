@@ -50,24 +50,45 @@ const AiCareerChat: React.FC = () => {
   useEffect(() => {
     const initializeSession = async () => {
       try {
-        const response = await fetch(process.env.NEXT_PUBLIC_API_URL +'/chat/chatSession', {
-          method: 'POST',
-          headers: {
-            "Authorization": "Bearer " + localStorage.getItem("token"),
-            'Content-Type': 'application/json',
-          },
-        });
+        // const response = await fetch(process.env.NEXT_PUBLIC_API_URL +'/chat/chatSession', {
+        //   method: 'POST',
+        //   headers: {
+        //     "Authorization": "Bearer " + localStorage.getItem("token"),
+        //     'Content-Type': 'application/json',
+        //   },
+        // });
 
-        if (!response.ok) {
-          throw new Error('Failed to initialize chat session');
-        }
+        // if (!response.ok) {
+        //   throw new Error('Failed to initialize chat session');
+        // }
 
-        const data: ChatSession = await response.json();
-        if (data.success) {
-          setSessionId(data.sessionId);
-        } else {
-          throw new Error(data.message);
-        }
+        // const data: ChatSession = await response.json();
+        // if (data.success) {
+        //   setSessionId(data.sessionId);
+        // } else {
+        //   throw new Error(data.message);
+        // }
+
+        if (typeof window !== 'undefined') {
+            const response = await fetch(process.env.NEXT_PUBLIC_API_URL + '/chat/chatSession', {
+              method: 'POST',
+              headers: {
+                "Authorization": "Bearer " + localStorage.getItem("token"),
+                'Content-Type': 'application/json',
+              },
+            });
+  
+            if (!response.ok) {
+              throw new Error('Failed to initialize chat session');
+            }
+  
+            const data: ChatSession = await response.json();
+            if (data.success) {
+              setSessionId(data.sessionId);
+            } else {
+              throw new Error(data.message);
+            }
+          }
       } catch (err) {
         setError('Failed to initialize chat. Please try again later.');
         console.error('Session initialization error:', err);

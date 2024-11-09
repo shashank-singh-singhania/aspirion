@@ -57,13 +57,25 @@ const Dashboard: React.FC = () => {
   const router = useRouter();
   const [userName, setUserName] = useState<string | null>(null);
 
+  // useEffect(() => {
+  //   if (!localStorage.getItem('token')) {
+  //     router.push('/signup');
+  //   }else {
+  //     const userData = localStorage.getItem('userData');
+  //     const parsedUserData = userData ? JSON.parse(userData) : null;
+  //     setUserName(parsedUserData?.name || null);
+  //   }
+  // }, [router]);
+
   useEffect(() => {
-    if (!localStorage.getItem('token')) {
-      router.push('/signup');
-    }else {
-      const userData = localStorage.getItem('userData');
-      const parsedUserData = userData ? JSON.parse(userData) : null;
-      setUserName(parsedUserData?.name || null);
+    if (typeof window !== 'undefined') {
+      if (!localStorage.getItem('token')) {
+        router.push('/signup');
+      } else {
+        const userData = localStorage.getItem('userData');
+        const parsedUserData = userData ? JSON.parse(userData) : null;
+        setUserName(parsedUserData?.name || null);
+      }
     }
   }, [router]);
 
