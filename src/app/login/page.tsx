@@ -19,7 +19,7 @@ const Login: React.FC = () => {
   };
 
   const login = async () => {
-    const request = await fetch('https://gdscbackend.sujal.info/auth/login', {
+    const request = await fetch('https://brainwaveapi.techpi.me/auth/login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -38,7 +38,7 @@ const Login: React.FC = () => {
       localStorage.setItem('token', response.token);
       localStorage.setItem('userData', JSON.stringify(response.data));
       setTimeout(() => {
-        router.push('/form');
+        router.push('/dashboard');
       }, 1000);
     } else {
       showAlert('Login Failed', 'red');

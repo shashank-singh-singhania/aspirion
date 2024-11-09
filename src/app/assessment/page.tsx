@@ -64,12 +64,29 @@ const SurveyForm: React.FC = () => {
     }
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (currentQuestion === questions.length - 1) {
-      console.log("Survey Submitted:", answers)
-      router.push('/result')
-    }
+    // if (currentQuestion === questions.length - 1) {
+    //   console.log("Survey Submitted:", answers)
+    //   router.push('/result')
+    // }
+
+    const request = await fetch('https://brainwaveapi.techpi.me/answer', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        userId: localStorage.getItem('userData') ? JSON.parse(localStorage.getItem('userData') || '{}')._id : '',
+        answer: answers,
+      }),
+    });
+    const response = await request.json();
+    console.log(response);
+    if(response.success){
+     
+        router.push('/result');
+      }
   }
 
   const getProgressPercentage = (category: string) => {

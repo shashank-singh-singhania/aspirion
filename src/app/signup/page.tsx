@@ -23,7 +23,7 @@ const SignUp: React.FC = () => {
       return;
     }
 
-    const request = await fetch('https://gdscbackend.sujal.info/auth/signup', {
+    const request = await fetch('https://brainwaveapi.techpi.me/auth/register', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
