@@ -1,12 +1,14 @@
 'use client'
 
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { BarChart3, BookOpen, FileCheck, MessageSquare, Clock, ArrowRight, Brain, User } from 'lucide-react'
 import Navbar from '@/components/Navbar'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { useRouter } from 'next/navigation';
+
 
 interface QuickLink {
   title: string;
@@ -51,11 +53,30 @@ const pastResults: PastResult[] = [
 ];
 
 const Dashboard: React.FC = () => {
+
+  const router = useRouter();
+  const [userName, setUserName] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!localStorage.getItem('token')) {
+      router.push('/signup');
+    }else {
+      const userData = localStorage.getItem('userData');
+      const parsedUserData = userData ? JSON.parse(userData) : null;
+      setUserName(parsedUserData?.name || null);
+    }
+  }, [router]);
+
+  const userData = localStorage.getItem('userData');
+  const UserName = userData ? JSON.parse(userData) : null;
+
+  console.log(UserName?.name);
+
   return (
     <div className="min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-200">
       <Navbar />
       <main className="container mx-auto px-4 py-8 pt-20">
-        <h1 className="text-3xl font-bold mb-8 text-gray-900 dark:text-white">Welcome, User!</h1>
+        <h1 className="text-3xl font-bold mb-8 text-gray-900 dark:text-white">Welcome, {UserName?.name}!</h1>
         
         <div className=" gap-8 mb-8">
           <Card className="col-span-1 lg:col-span-2">

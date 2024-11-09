@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Brain, BookOpen, User } from 'lucide-react'
 
+
 interface Question {
   _id: string
   questionText: string
@@ -32,7 +33,11 @@ const SurveyForm: React.FC = () => {
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
-        const response = await fetch('https://brainwaveapi.techpi.me/question')
+        const response = await fetch(process.env.NEXT_PUBLIC_API_URL +'/question',{
+          headers:{
+            "Authorization": "Bearer " + localStorage.getItem("token"),
+          }
+        })
         const data = await response.json()
         setQuestions(data.data)
       } catch (error) {
@@ -71,10 +76,11 @@ const SurveyForm: React.FC = () => {
     //   router.push('/result')
     // }
 
-    const request = await fetch('https://brainwaveapi.techpi.me/answer', {
+    const request = await fetch(process.env.NEXT_PUBLIC_API_URL+'/answer', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        "Authorization": "Bearer " + localStorage.getItem("token"),
       },
       body: JSON.stringify({
         userId: localStorage.getItem('userData') ? JSON.parse(localStorage.getItem('userData') || '{}')._id : '',
@@ -84,6 +90,7 @@ const SurveyForm: React.FC = () => {
     const response = await request.json();
     console.log(response);
     if(response.success){
+      localStorage.setItem("answerId",response.data._id)
      
         router.push('/result');
       }

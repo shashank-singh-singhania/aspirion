@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, FormEvent } from 'react';
+import React, { useState, useEffect, FormEvent, use } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -23,13 +23,13 @@ const SignUp: React.FC = () => {
       return;
     }
 
-    const request = await fetch('https://brainwaveapi.techpi.me/auth/register', {
+    const request = await fetch(process.env.NEXT_PUBLIC_API_URL+'/auth/register', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        userName,
+        name: userName,
         email,
         password,
       }),
@@ -79,7 +79,7 @@ const SignUp: React.FC = () => {
             <div className="mb-4">
               <label className="block text-gray-700 text-sm font-bold mb-2">Username</label>
               <input
-                className="w-full p-3 border rounded-lg focus:outline-none focus:ring focus:border-blue-500"
+                className="w-full p-3 border rounded-lg focus:outline-none focus:ring focus:border-blue-500 text-black"
                 type="text"
                 placeholder="Enter your username"
                 value={userName}
@@ -90,7 +90,7 @@ const SignUp: React.FC = () => {
             <div className="mb-4">
               <label className="block text-gray-700 text-sm font-bold mb-2">Email</label>
               <input
-                className="w-full p-3 border rounded-lg focus:outline-none focus:ring focus:border-blue-500"
+                className="w-full p-3 border rounded-lg focus:outline-none focus:ring focus:border-blue-500 text-black"
                 type="email"
                 placeholder="Enter your email"
                 value={email}
@@ -101,7 +101,7 @@ const SignUp: React.FC = () => {
             <div className="mb-4">
               <label className="block text-gray-700 text-sm font-bold mb-2">Password</label>
               <input
-                className="w-full p-3 border rounded-lg focus:outline-none focus:ring focus:border-blue-500"
+                className="w-full p-3 border rounded-lg focus:outline-none focus:ring focus:border-blue-500 text-black"
                 type="password"
                 placeholder="Enter your password"
                 value={password}
@@ -112,7 +112,7 @@ const SignUp: React.FC = () => {
             <div className="mb-6">
               <label className="block text-gray-700 text-sm font-bold mb-2">Confirm Password</label>
               <input
-                className="w-full p-3 border rounded-lg focus:outline-none focus:ring focus:border-blue-500"
+                className="w-full p-3 border rounded-lg focus:outline-none focus:ring focus:border-blue-500 text-black"
                 type="password"
                 placeholder="Confirm your password"
                 value={cPassword}

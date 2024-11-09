@@ -24,7 +24,7 @@ export default function LandingPage() {
                 </p>
               </div>
               <div className="space-x-4">
-                <Link href="/assessment">
+                <Link href="/dashboard">
                   <Button className="bg-emerald-600 text-white hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600" size="lg">
                     Start Your Career Journey
                   </Button>

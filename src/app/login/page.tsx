@@ -19,7 +19,7 @@ const Login: React.FC = () => {
   };
 
   const login = async () => {
-    const request = await fetch('https://brainwaveapi.techpi.me/auth/login', {
+    const request = await fetch(process.env.NEXT_PUBLIC_API_URL +'/auth/login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -72,7 +72,7 @@ const Login: React.FC = () => {
               <label className="block text-gray-700 text-sm font-bold mb-2">Email</label>
               <input
                 ref={emailRef}
-                className="w-full p-3 border rounded-lg focus:outline-none focus:ring focus:border-blue-500"
+                className="w-full p-3 border rounded-lg focus:outline-none focus:ring focus:border-blue-500 text-black"
                 type="email"
                 placeholder="Enter your email"
                 onChange={(e) => setEmail(e.target.value)}
@@ -84,7 +84,7 @@ const Login: React.FC = () => {
               <label className="block text-gray-700 text-sm font-bold mb-2">Password</label>
               <input
                 ref={passwordRef}
-                className="w-full p-3 border rounded-lg focus:outline-none focus:ring focus:border-blue-500"
+                className="w-full p-3 border rounded-lg focus:outline-none focus:ring focus:border-blue-500 text-black"
                 type="password"
                 placeholder="Enter your password"
                 onChange={(e) => setPassword(e.target.value)}

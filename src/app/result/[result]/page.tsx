@@ -32,31 +32,34 @@ interface Result {
     }[];
   };
 }
-
-const fetchResult = async (): Promise<Result> => {
-  const response = await fetch(process.env.NEXT_PUBLIC_API_URL +"/model", {
-    method: "POST",
+// const api=process.env.API
+const fetchResult = async ({ modelId }: { modelId: string }): Promise<Result> => {
+  const response = await fetch(process.env.NEXT_PUBLIC_API_URL + `/model/${modelId}`, {
+    method: "GET",
     headers: {
       "Content-Type": "application/json",
       "Authorization": "Bearer " + localStorage.getItem("token"),
     },
-    body: JSON.stringify({answerId: localStorage.getItem('answerId') }),
   });
   const data = await response.json();
   return data;
 };
 
-export default function ResultPage({params}:any) {
-  const [result, setResult] = useState<Result | null>();
+export default function ResultPage({ params }: any) {
+  const [result, setResult] = useState<Result | null>(null);
 
-  console.log(params?.result);
+  const modelId = params?.result;
+  console.log(modelId);
 
   useEffect(() => {
-    fetchResult().then((data:any) => {
-      setResult(data.data);
-      console.log(data);
-    });
-  }, []);
+    if (modelId) {
+      fetchResult({ modelId }).then((data:any) => {
+        setResult(data.data);
+        // setResult(data);
+        console.log(data);
+      }).catch(error => console.error("Error fetching result:", error));
+    }
+  }, [modelId]);
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-200">
@@ -66,7 +69,7 @@ export default function ResultPage({params}:any) {
           <h1 className="text-4xl font-bold mb-2 text-gray-900 dark:text-white">
             Your Career Assessment Results
           </h1>
-          <p className="text-emerald-600 dark:text-emerald-400">Based on your unique profile and preferences</p>
+          <p className="text-gray-500 dark:text-gray-400">Based on your unique profile and preferences</p>
         </header>
 
         <main className="max-w-5xl mx-auto space-y-12">
@@ -162,5 +165,5 @@ export default function ResultPage({params}:any) {
         </footer>
       </div>
     </div>
-  );
+  )
 }
