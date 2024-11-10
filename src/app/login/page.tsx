@@ -19,7 +19,7 @@ const Login: React.FC = () => {
   };
 
   const login = async () => {
-    const request = await fetch(process.env.NEXT_PUBLIC_API_URL +'/auth/login', {
+    const request = await fetch('https://brainwaveapi.techpi.me/auth/login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
