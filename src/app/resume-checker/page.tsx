@@ -12,12 +12,10 @@ import { AlertCircle, CheckCircle, Upload } from 'lucide-react'
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
 interface ModelResponse {
-  feedback: {
-    formatIssues: string[];
-    contentSuggestions: string[];
-    grammarIssues: string[];
-    effectivenessTips: string[];
-  };
+  formatIssues: string[];
+  contentSuggestions: string[];
+  grammarIssues: string[];
+  effectivenessTips: string[];
   sampleCorrections: {
     [key: string]: string;
   };
@@ -28,11 +26,8 @@ interface ApiResponse {
   status: number;
   message: string;
   data: {
-    userId: string;
-    resumeLink: string;
+    feedback: ModelResponse;
     modelResponse: ModelResponse;
-    _id: string;
-    __v: number;
   };
 }
 
@@ -61,56 +56,22 @@ const ResumeChecker: React.FC = () => {
     setError(null)
 
     const formData = new FormData()
-    formData.append('resume', file)
+    formData.append('file', file)
 
     try {
-      // Replace with your actual API endpoint
-    //   const response = await fetch('https://api.example.com/resume-check', {
-    //     method: 'POST',
-    //     body: formData,
-    //   })
-
-    const data: ApiResponse = {
-      success: true,
-      status: 200,
-      message: 'Resume processed successfully',
-      data: {
-        userId: '12345',
-        resumeLink: 'https://example.com/resume.pdf',
-        modelResponse: {
-          feedback: {
-            formatIssues: [
-              "Inconsistent headings and section titles; ensure uniformity in font size and style.",
-              "Uneven spacing between sections; maintain consistent margins and spacing."
-            ],
-            contentSuggestions: [
-              "Include an 'Objective' or 'Summary' section at the beginning to provide a quick overview of career goals and key qualifications.",
-              "Consider adding a 'Skills' section to highlight technical skills separately for better visibility."
-            ],
-            grammarIssues: [
-              "Ensure consistent use of tense, e.g., past tense for completed projects and present tense for ongoing roles.",
-              "Correct minor typos such as 'A CHIEVEMENTS' to 'ACHIEVEMENTS'."
-            ],
-            effectivenessTips: [
-              "Align projects and experiences more closely with the job description or industry standards by emphasizing impact and results.",
-              "Use bullet points for easier readability and to highlight key achievements and responsibilities succinctly."
-            ]
-          },
-          sampleCorrections: {
-            Education: "Netaji Subhas University of Technology, New Delhi | B. Tech. in Instrumentation and Control Engineering, Expected 2028",
-            Objective: "Aspiring data scientist with a strong foundation in machine learning and data analysis, seeking to leverage skills in a challenging role within the tech industry."
-          }
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/resume`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },
-        _id: 'abc123',
-        __v: 0
+        method: 'POST',
+        body: formData,
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to upload resume')
       }
-    }
 
-    //   if (!response.ok) {
-    //     throw new Error('Failed to upload resume')
-    //   }
-
-    //   const data: ApiResponse = await response.json()
+      const data: ApiResponse = await response.json()
       setApiResponse(data)
     } catch (err) {
       setError('An error occurred while processing your resume. Please try again.')
@@ -170,11 +131,11 @@ const ResumeChecker: React.FC = () => {
                 </TabsList>
                 <TabsContent value="feedback">
                   <div className="space-y-4">
-                    {Object.entries(apiResponse.data.modelResponse.feedback).map(([key, issues]) => (
+                    {apiResponse.data.feedback && Object.entries(apiResponse.data.feedback).map(([key, issues]) => (
                       <div key={key}>
                         <h3 className="text-lg font-semibold capitalize mb-2">{key.replace(/([A-Z])/g, ' $1').trim()}</h3>
                         <ul className="list-disc pl-5 space-y-1">
-                          {issues.map((issue, index) => (
+                          {Array.isArray(issues) && issues.map((issue, index) => (
                             <li key={index}>{issue}</li>
                           ))}
                         </ul>
@@ -184,7 +145,7 @@ const ResumeChecker: React.FC = () => {
                 </TabsContent>
                 <TabsContent value="corrections">
                   <div className="space-y-4">
-                    {Object.entries(apiResponse.data.modelResponse.sampleCorrections).map(([key, correction]) => (
+                    {apiResponse.data.modelResponse && apiResponse.data.modelResponse.sampleCorrections && Object.entries(apiResponse.data.modelResponse.sampleCorrections).map(([key, correction]) => (
                       <div key={key}>
                         <h3 className="text-lg font-semibold mb-1">{key}</h3>
                         <p>{correction}</p>

@@ -11,7 +11,6 @@ import { Label } from "@/components/ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Brain, BookOpen, User } from 'lucide-react'
 
-
 interface Question {
   _id: string
   questionText: string
@@ -20,6 +19,7 @@ interface Question {
   explanation: string
   options: string[]
   parameter: string
+  correctAnswer?: string
 }
 
 const SurveyForm: React.FC = () => {
@@ -27,6 +27,7 @@ const SurveyForm: React.FC = () => {
   const [currentQuestion, setCurrentQuestion] = useState(0)
   const [answers, setAnswers] = useState<Record<string, string>>({})
   const [activeCategory, setActiveCategory] = useState<string>('survey')
+  const [aptitudeScore, setAptitudeScore] = useState(0)
 
   const router = useRouter()
 
@@ -40,6 +41,7 @@ const SurveyForm: React.FC = () => {
         })
         const data = await response.json()
         setQuestions(data.data)
+        setActiveCategory(data.data[0].category)
       } catch (error) {
         console.error("Error fetching questions:", error)
       }
@@ -49,33 +51,58 @@ const SurveyForm: React.FC = () => {
   }, [])
 
   const handleInputChange = (value: string) => {
-    setAnswers({
-      ...answers,
+    setAnswers(prevAnswers => ({
+      ...prevAnswers,
       [questions[currentQuestion].parameter]: value,
-    })
+    }))
+
+    if (questions[currentQuestion].category === 'aptitude' && value === questions[currentQuestion].correctAnswer) {
+      setAptitudeScore(prevScore => prevScore + 1)
+    }
   }
 
   const goToNextQuestion = () => {
-    if (currentQuestion < questions.length - 1) {
-      setCurrentQuestion(currentQuestion + 1)
-      setActiveCategory(questions[currentQuestion + 1].category)
+    const currentCategoryQuestions = questions.filter(q => q.category === activeCategory)
+    const currentIndexInCategory = currentCategoryQuestions.findIndex(q => q._id === questions[currentQuestion]._id)
+    
+    if (currentIndexInCategory < currentCategoryQuestions.length - 1) {
+      const nextQuestionIndex = questions.findIndex(q => q._id === currentCategoryQuestions[currentIndexInCategory + 1]._id)
+      setCurrentQuestion(nextQuestionIndex)
+    } else {
+      const categoryIndex = categories.indexOf(activeCategory)
+      if (categoryIndex < categories.length - 1) {
+        const nextCategory = categories[categoryIndex + 1]
+        setActiveCategory(nextCategory)
+        const nextCategoryFirstQuestion = questions.find(q => q.category === nextCategory)
+        if (nextCategoryFirstQuestion) {
+          setCurrentQuestion(questions.findIndex(q => q._id === nextCategoryFirstQuestion._id))
+        }
+      }
     }
   }
 
   const goToPreviousQuestion = () => {
-    if (currentQuestion > 0) {
-      setCurrentQuestion(currentQuestion - 1)
-      setActiveCategory(questions[currentQuestion - 1].category)
+    const currentCategoryQuestions = questions.filter(q => q.category === activeCategory)
+    const currentIndexInCategory = currentCategoryQuestions.findIndex(q => q._id === questions[currentQuestion]._id)
+    
+    if (currentIndexInCategory > 0) {
+      const prevQuestionIndex = questions.findIndex(q => q._id === currentCategoryQuestions[currentIndexInCategory - 1]._id)
+      setCurrentQuestion(prevQuestionIndex)
+    } else {
+      const categoryIndex = categories.indexOf(activeCategory)
+      if (categoryIndex > 0) {
+        const prevCategory = categories[categoryIndex - 1]
+        setActiveCategory(prevCategory)
+        const prevCategoryLastQuestion = questions.filter(q => q.category === prevCategory).pop()
+        if (prevCategoryLastQuestion) {
+          setCurrentQuestion(questions.findIndex(q => q._id === prevCategoryLastQuestion._id))
+        }
+      }
     }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // if (currentQuestion === questions.length - 1) {
-    //   console.log("Survey Submitted:", answers)
-    //   router.push('/result')
-    // }
-
     const request = await fetch(process.env.NEXT_PUBLIC_API_URL+'/answer', {
       method: 'POST',
       headers: {
@@ -84,16 +111,18 @@ const SurveyForm: React.FC = () => {
       },
       body: JSON.stringify({
         userId: localStorage.getItem('userData') ? JSON.parse(localStorage.getItem('userData') || '{}')._id : '',
-        answer: answers,
+        answer: {
+          ...answers,
+          aptitudeScore: aptitudeScore
+        },
       }),
     });
     const response = await request.json();
     console.log(response);
     if(response.success){
       localStorage.setItem("answerId",response.data._id)
-     
-        router.push('/result');
-      }
+      router.push('/result');
+    }
   }
 
   const getProgressPercentage = (category: string) => {
@@ -113,6 +142,14 @@ const SurveyForm: React.FC = () => {
     survey: <BookOpen className="w-6 h-6" />,
     personality: <User className="w-6 h-6" />,
     aptitude: <Brain className="w-6 h-6" />,
+  }
+
+  const handleCategoryChange = (category: string) => {
+    setActiveCategory(category)
+    const firstQuestionInCategory = questions.find(q => q.category === category)
+    if (firstQuestionInCategory) {
+      setCurrentQuestion(questions.findIndex(q => q._id === firstQuestionInCategory._id))
+    }
   }
 
   const CircularProgress: React.FC<{ percentage: number, color: string, icon: React.ReactNode }> = ({ percentage, color, icon }) => (
@@ -155,7 +192,7 @@ const SurveyForm: React.FC = () => {
           <CardContent>
             {questions.length > 0 ? (
               <form onSubmit={handleSubmit}>
-                <Tabs value={activeCategory} onValueChange={setActiveCategory} className="w-full">
+                <Tabs value={activeCategory} onValueChange={handleCategoryChange} className="w-full">
                   <TabsList className="grid w-full grid-cols-3">
                     {categories.map((category) => (
                       <TabsTrigger key={category} value={category} className="capitalize">
@@ -237,7 +274,6 @@ const SurveyForm: React.FC = () => {
           </CardContent>
         </Card>
 
-        {/* Sidebar */}
         <Card className="w-full lg:w-1/4 lg:sticky lg:top-20 lg:max-h-[calc(100vh-5rem)] overflow-y-auto">
           <CardHeader>
             <CardTitle className="text-xl font-semibold text-gray-900 dark:text-white">Progress Overview</CardTitle>
