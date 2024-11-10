@@ -1,11 +1,15 @@
 'use client'
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Brain, GraduationCap, BookOpen, Briefcase, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
+// import Loading from "@/components/Loading"; // Make sure to import the Loading component
+// import Loading from "@/components/Loading";
 import { useEffect, useState } from "react";
+import Loading from "@/components/Loading";
 
 interface Result {
   modelResponse: string;
@@ -48,15 +52,22 @@ const fetchResult = async (): Promise<Result> => {
 
 export default function ResultPage({params}:any) {
   const [result, setResult] = useState<Result | null>();
+  const [isLoading, setIsLoading] = useState(true);
 
   console.log(params?.result);
 
   useEffect(() => {
     fetchResult().then((data:any) => {
       setResult(data.data);
+      setIsLoading(false);
       console.log(data);
     });
   }, []);
+
+  if (isLoading) {
+    // return <Loading />;
+    return <Loading />;
+  }
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-200">
