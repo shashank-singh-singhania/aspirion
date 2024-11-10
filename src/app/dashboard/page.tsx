@@ -9,7 +9,6 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useRouter } from 'next/navigation';
 
-
 interface QuickLink {
   title: string;
   icon: React.ElementType;
@@ -53,23 +52,13 @@ const pastResults: PastResult[] = [
 ];
 
 const Dashboard: React.FC = () => {
-
   const router = useRouter();
   const [userName, setUserName] = useState<string | null>(null);
 
-  // useEffect(() => {
-  //   if (!localStorage.getItem('token')) {
-  //     router.push('/signup');
-  //   }else {
-  //     const userData = localStorage.getItem('userData');
-  //     const parsedUserData = userData ? JSON.parse(userData) : null;
-  //     setUserName(parsedUserData?.name || null);
-  //   }
-  // }, [router]);
-
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      if (!localStorage.getItem('token')) {
+      const token = localStorage.getItem('token');
+      if (!token) {
         router.push('/signup');
       } else {
         const userData = localStorage.getItem('userData');
@@ -79,18 +68,13 @@ const Dashboard: React.FC = () => {
     }
   }, [router]);
 
-  const userData = localStorage.getItem('userData');
-  const UserName = userData ? JSON.parse(userData) : null;
-
-  console.log(UserName?.name);
-
   return (
     <div className="min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-200">
       <Navbar />
       <main className="container mx-auto px-4 py-8 pt-20">
-        <h1 className="text-3xl font-bold mb-8 text-gray-900 dark:text-white">Welcome, {UserName?.name}!</h1>
+        <h1 className="text-3xl font-bold mb-8 text-gray-900 dark:text-white">Welcome, {userName}!</h1>
         
-        <div className=" gap-8 mb-8">
+        <div className="gap-8 mb-8">
           <Card className="col-span-1 lg:col-span-2">
             <CardHeader>
               <CardTitle className="text-2xl font-bold text-gray-900 dark:text-white">Career Tools</CardTitle>
@@ -115,30 +99,6 @@ const Dashboard: React.FC = () => {
               })}
             </CardContent>
           </Card>
-
-          {/* <Card>
-            <CardHeader>
-              <CardTitle className="text-xl font-semibold text-gray-900 dark:text-white">Progress Overview</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="flex justify-center">
-                <CircularProgress percentage={78} color="text-emerald-600 dark:text-emerald-400" size={32} />
-              </div>
-              <div className="grid grid-cols-3 gap-4">
-                {[
-                  { category: 'survey', icon: BookOpen, percentage: 90, color: 'text-blue-500' },
-                  { category: 'personality', icon: User, percentage: 75, color: 'text-purple-500' },
-                  { category: 'aptitude', icon: Brain, percentage: 60, color: 'text-orange-500' },
-                ].map(({ category, icon: Icon, percentage, color }) => (
-                  <div key={category} className="flex flex-col items-center space-y-2">
-                    <CircularProgress percentage={percentage} color={color} icon={<Icon className="w-6 h-6" />} size={20} />
-                    <span className="text-xs font-medium text-gray-700 dark:text-gray-300 capitalize">{category}</span>
-                    <span className="text-sm font-bold text-gray-900 dark:text-white">{percentage}%</span>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card> */}
         </div>
 
         <Card>
